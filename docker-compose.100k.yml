@@ -1,0 +1,33 @@
+﻿version: "3.8"
+
+services:
+  postgis:
+    image: papajohn77/postgis_100k
+    container_name: postgis
+    volumes:
+      - postgis-data-100k:/var/lib/postgresql/data
+    env_file:
+      - ./env/postgis.env
+    restart: unless-stopped
+
+  minimal-api:
+    image: papajohn77/postgis_api
+    env_file:
+      - ./env/minimal-api.env
+    restart: unless-stopped
+    depends_on:
+      - postgis
+
+  nginx:
+    image: papajohn77/nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+    env_file:
+      - ./env/nginx.env
+    restart: unless-stopped
+    depends_on:
+      - minimal-api
+
+volumes:
+  postgis-data-100k:
